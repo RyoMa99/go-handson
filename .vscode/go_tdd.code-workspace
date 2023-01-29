@@ -1,0 +1,61 @@
+{
+  "folders": [
+    {
+      "name": "go_handson",
+      "path": ".."
+    }
+  ],
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "debug",
+        "type": "go",
+        "request": "launch",
+        "program": "${workspaceFolder}/main.go",
+        "env": {},
+        "args": []
+      }
+     ]
+  },
+  "settings": {
+    "[go]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "golang.go"
+    },
+    "go.toolsManagement.autoUpdate": true,
+  },
+  "extensions": {
+    "recommendations": [
+      // 汎用
+      "ms-ceintl.vscode-language-pack-ja", // vscode日本語化
+      "vscode-icons-team.vscode-icons", // ファイルの拡張子ごとのアイコン
+      "streetsidesoftware.code-spell-checker", // コード中のスペルチェック
+      "mosapride.zenkaku", // 全角スペースを表示する
+      "satokaz.vscode-bs-ctrlchar-remover", // 制御文字の削除。ppt等からコピペした際に使える
+      "fabiospampinato.vscode-todo-plus", // TODOをサイドメニューにリストアップ
+      
+      // フォーマッタ
+      "editorconfig.editorconfig", // editorconfig
+      "redhat.vscode-yaml", // yaml
+      "mikestead.dotenv", // .env
+      "yzhang.markdown-all-in-one", // markdown
+      
+      // git
+      "mhutchie.git-graph", // gitの履歴をグラフ表示
+      "eamodio.gitlens", // ファイルの改修履歴をペイン分割して見れる
+      "donjayamanne.githistory", // git logをvscodeで見れる
+
+      // 作図
+      "jebbs.plantuml", // vscodeでplantumlを書くのに必要
+      "hediet.vscode-drawio", // vscodeでdrawioを使えるようにする
+
+      // docker・k8s
+      "ms-azuretools.vscode-docker", // dockerfileの編集に使う
+      "ms-kubernetes-tools.vscode-kubernetes-tools", // k8s clusterをサイドに表示する
+
+      // go
+      "golang.go", // go 開発全般
+    ],
+  },
+}
