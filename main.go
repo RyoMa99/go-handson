@@ -1,21 +1,14 @@
 package main
 
 import (
+	"handson/infrastructure"
 	"handson/server"
 	"log"
 	"net/http"
 )
 
-type InMemoryPlayerStore struct{}
-
-func (i *InMemoryPlayerStore) GetPlayerScore(name string) int {
-	return 123
-}
-
-func (i *InMemoryPlayerStore) RecordWin(name string) {}
-
 func main() {
-	handler := &server.PlayerServer{Store: &InMemoryPlayerStore{}}
+	handler := &server.PlayerServer{Store: infrastructure.NewInMemoryPlayerStore()}
 
 	log.Fatal(http.ListenAndServe(":5000", handler))
 }
