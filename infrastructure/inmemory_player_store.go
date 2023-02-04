@@ -1,6 +1,9 @@
 package infrastructure
 
-import "sync"
+import (
+	"handson/domain"
+	"sync"
+)
 
 func NewInMemoryPlayerStore() *InMemoryPlayerStore {
 	return &InMemoryPlayerStore{
@@ -24,4 +27,8 @@ func (i *InMemoryPlayerStore) GetPlayerScore(name string) int {
 	i.lock.RLock()
 	defer i.lock.RUnlock()
 	return i.Store[name]
+}
+
+func (i *InMemoryPlayerStore) GetLeague() []domain.Player {
+	return nil
 }

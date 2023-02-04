@@ -3,18 +3,15 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"handson/domain"
 	"net/http"
 	"strings"
 )
 
-type Player struct {
-	Name string
-	Wins int
-}
-
 type PlayerStore interface {
 	GetPlayerScore(name string) int
 	RecordWin(name string)
+	GetLeague() []domain.Player
 }
 
 type PlayerServer struct {
@@ -38,15 +35,9 @@ func NewPlayerServer(store PlayerStore) *PlayerServer {
 
 func (p *PlayerServer) leagueHandler(w http.ResponseWriter, r *http.Request) {
 
-	json.NewEncoder(w).Encode(p.getLeagueTable())
+	json.NewEncoder(w).Encode(p.Store.GetLeague())
 
 	w.WriteHeader(http.StatusOK)
-}
-
-func (p *PlayerServer) getLeagueTable() []Player {
-	return []Player{
-		{"Chris", 20},
-	}
 }
 
 func (p *PlayerServer) playersHandler(w http.ResponseWriter, r *http.Request) {
