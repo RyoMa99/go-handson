@@ -9,10 +9,18 @@
     "version": "0.2.0",
     "configurations": [
       {
-        "name": "debug",
+        "name": "server",
         "type": "go",
         "request": "launch",
-        "program": "${workspaceFolder}/main.go",
+        "program": "${workspaceFolder}/cmd/server/main.go",
+        "env": {},
+        "args": []
+      },
+      {
+        "name": "cli",
+        "type": "go",
+        "request": "launch",
+        "program": "${workspaceFolder}/cmd/cli/main.go",
         "env": {},
         "args": []
       }

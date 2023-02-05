@@ -10,18 +10,12 @@ import (
 
 const jsonContentType = "application/json"
 
-type PlayerStore interface {
-	GetPlayerScore(name string) int
-	RecordWin(name string)
-	GetLeague() domain.League
-}
-
 type PlayerServer struct {
-	Store        PlayerStore
+	Store        domain.PlayerStore
 	http.Handler // 埋め込みは公開されるメソッドやフィールドに注意。ServeHTTPメソッドだけを公開しているインターフェースなので問題ない。
 }
 
-func NewPlayerServer(store PlayerStore) *PlayerServer {
+func NewPlayerServer(store domain.PlayerStore) *PlayerServer {
 	p := new(PlayerServer)
 
 	p.Store = store
