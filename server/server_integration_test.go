@@ -10,9 +10,13 @@ import (
 )
 
 func TestRecordingWinsAndRetrievingThem(t *testing.T) {
-	database, cleanDatabase := createTempFile(t, "")
+	database, cleanDatabase := createTempFile(t, "[]")
 	defer cleanDatabase()
-	server := NewPlayerServer(infrastructure.NewFileSystemPlayerStore(database))
+
+	store, err := infrastructure.NewFileSystemPlayerStore(database)
+	assertNoError(t, err)
+
+	server := NewPlayerServer(store)
 	player := "Pepper"
 
 	server.ServeHTTP(httptest.NewRecorder(), newPostWinRequest(player))
@@ -58,4 +62,11 @@ func createTempFile(t testing.TB, initialData string) (*os.File, func()) {
 	}
 
 	return tmpfile, removeFile
+}
+
+func assertNoError(t testing.TB, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatalf("didn't expect an error but got one, %v", err)
+	}
 }

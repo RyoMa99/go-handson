@@ -2,18 +2,23 @@ package infrastructure
 
 import (
 	"encoding/json"
+	"fmt"
 	"handson/domain"
 	"os"
 )
 
-func NewFileSystemPlayerStore(database *os.File) *FileSystemPlayerStore {
-	database.Seek(0, 0)
-	league, _ := domain.NewLeague(database)
+func NewFileSystemPlayerStore(file *os.File) (*FileSystemPlayerStore, error) {
+	file.Seek(0, 0)
+	league, err := domain.NewLeague(file)
+
+	if err != nil {
+		return nil, fmt.Errorf("problem loading player store from file %s, %v", file.Name(), err)
+	}
 
 	return &FileSystemPlayerStore{
-		database: json.NewEncoder(&tape{database}),
+		database: json.NewEncoder(&tape{file}),
 		league:   league,
-	}
+	}, nil
 }
 
 type FileSystemPlayerStore struct {
