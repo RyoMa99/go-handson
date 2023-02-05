@@ -3,7 +3,6 @@ package infrastructure
 import (
 	"encoding/json"
 	"handson/domain"
-	"io"
 	"os"
 )
 
@@ -12,13 +11,13 @@ func NewFileSystemPlayerStore(database *os.File) *FileSystemPlayerStore {
 	league, _ := domain.NewLeague(database)
 
 	return &FileSystemPlayerStore{
-		database: &tape{database},
+		database: json.NewEncoder(&tape{database}),
 		league:   league,
 	}
 }
 
 type FileSystemPlayerStore struct {
-	database io.Writer
+	database *json.Encoder
 	league   domain.League
 }
 
@@ -45,6 +44,5 @@ func (f *FileSystemPlayerStore) RecordWin(name string) {
 		f.league = append(f.league, domain.Player{Name: name, Wins: 1})
 	}
 
-	json.NewEncoder(f.database).Encode(f.league)
-
+	f.database.Encode(f.league)
 }
