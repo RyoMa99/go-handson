@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"handson/domain"
 	"io"
+	"os"
 )
 
-func NewFileSystemPlayerStore(database io.ReadWriteSeeker) *FileSystemPlayerStore {
+func NewFileSystemPlayerStore(database *os.File) *FileSystemPlayerStore {
 	database.Seek(0, 0)
 	league, _ := domain.NewLeague(database)
 

@@ -3,7 +3,6 @@ package server
 import (
 	"handson/domain"
 	"handson/infrastructure"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -42,7 +41,7 @@ func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 
 }
 
-func createTempFile(t testing.TB, initialData string) (io.ReadWriteSeeker, func()) {
+func createTempFile(t testing.TB, initialData string) (*os.File, func()) {
 	t.Helper()
 
 	tmpfile, err := os.CreateTemp("", "db")
