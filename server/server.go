@@ -31,10 +31,9 @@ func NewPlayerServer(store domain.PlayerStore) *PlayerServer {
 
 func (p *PlayerServer) leagueHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", jsonContentType)
+	w.WriteHeader(http.StatusOK)
 
 	json.NewEncoder(w).Encode(p.Store.GetLeague())
-
-	w.WriteHeader(http.StatusOK)
 }
 
 func (p *PlayerServer) playersHandler(w http.ResponseWriter, r *http.Request) {
