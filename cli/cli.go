@@ -1,11 +1,15 @@
 package cli
 
-import "handson/domain"
+import (
+	"handson/domain"
+	"io"
+)
 
 type CLI struct {
 	playerStore domain.PlayerStore
+	in          io.Reader
 }
 
 func (cli *CLI) PlayPoker() {
-	cli.playerStore.RecordWin("Cleo")
+	cli.playerStore.RecordWin("Chris")
 }
