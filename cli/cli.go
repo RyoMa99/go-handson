@@ -2,16 +2,18 @@ package cli
 
 import (
 	"bufio"
+	"fmt"
 	"handson/domain"
 	"io"
 	"strings"
 	"time"
 )
 
-func NewCLI(store domain.PlayerStore, in io.Reader, alerter BlindAlerter) *CLI {
+func NewCLI(store domain.PlayerStore, in io.Reader, out io.Writer, alerter BlindAlerter) *CLI {
 	return &CLI{
 		playerStore: store,
 		in:          bufio.NewScanner(in),
+		out:         out,
 		alerter:     alerter,
 	}
 }
@@ -19,10 +21,14 @@ func NewCLI(store domain.PlayerStore, in io.Reader, alerter BlindAlerter) *CLI {
 type CLI struct {
 	playerStore domain.PlayerStore
 	in          *bufio.Scanner
+	out         io.Writer
 	alerter     BlindAlerter
 }
 
+const PlayerPrompt = "Please enter the number of players: "
+
 func (cli *CLI) PlayPoker() {
+	fmt.Fprint(cli.out, PlayerPrompt)
 	cli.scheduleBlindAlerts()
 	userInput := cli.readLine()
 	cli.playerStore.RecordWin(extractWinner(userInput))
