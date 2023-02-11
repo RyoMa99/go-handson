@@ -3,44 +3,36 @@ package cli
 import (
 	"bufio"
 	"fmt"
-	"handson/domain"
 	"io"
+	"strconv"
 	"strings"
-	"time"
 )
 
-func NewCLI(store domain.PlayerStore, in io.Reader, out io.Writer, alerter BlindAlerter) *CLI {
+func NewCLI(in io.Reader, out io.Writer, game Game) *CLI {
 	return &CLI{
-		playerStore: store,
-		in:          bufio.NewScanner(in),
-		out:         out,
-		alerter:     alerter,
+		in:   bufio.NewScanner(in),
+		out:  out,
+		game: game,
 	}
 }
 
 type CLI struct {
-	playerStore domain.PlayerStore
-	in          *bufio.Scanner
-	out         io.Writer
-	alerter     BlindAlerter
+	in   *bufio.Scanner
+	out  io.Writer
+	game Game
 }
 
 const PlayerPrompt = "Please enter the number of players: "
 
 func (cli *CLI) PlayPoker() {
 	fmt.Fprint(cli.out, PlayerPrompt)
-	cli.scheduleBlindAlerts()
-	userInput := cli.readLine()
-	cli.playerStore.RecordWin(extractWinner(userInput))
-}
 
-func (cli *CLI) scheduleBlindAlerts() {
-	blinds := []int{100, 200, 300, 400, 500, 600, 800, 1000, 2000, 4000, 8000}
-	blindTime := 0 * time.Second
-	for _, blind := range blinds {
-		cli.alerter.ScheduleAlertAt(blindTime, blind)
-		blindTime = blindTime + 10*time.Minute
-	}
+	numberOfPlayers, _ := strconv.Atoi(cli.readLine())
+
+	cli.game.Start(numberOfPlayers)
+
+	userInput := cli.readLine()
+	cli.game.Finish(extractWinner(userInput))
 }
 
 func (cli *CLI) readLine() string {
