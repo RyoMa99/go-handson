@@ -47,6 +47,7 @@ func (s *SpyBlindAlerter) ScheduleAlertAt(duration time.Duration, amount int) {
 
 type GameSpy struct {
 	StartedWith  int
+	StartCalled  bool
 	FinishedWith string
 }
 
@@ -77,6 +78,23 @@ func TestCLI(t *testing.T) {
 		if game.StartedWith != 7 {
 			t.Errorf("wanted Start called with 7 but got %d", game.StartedWith)
 		}
+	})
+
+	t.Run("it prints an error when a non numeric value is entered and does not start the game", func(t *testing.T) {
+		stdout := &bytes.Buffer{}
+		in := strings.NewReader("Pies\n")
+		game := &GameSpy{}
+
+		cli := NewCLI(in, stdout, game)
+		cli.PlayPoker()
+
+		if game.StartCalled {
+			t.Errorf("game should not have started")
+		}
+
+		wantPrompt := PlayerPrompt + BadPlayerInputErrMsg
+
+		assertMessagesSentToUser(t, stdout, wantPrompt)
 	})
 }
 
@@ -117,4 +135,13 @@ func assertScheduledAlert(t testing.TB, got, want scheduledAlert) {
 		t.Errorf("got scheduled time of %v, want %v", got.at, want.at)
 	}
 
+}
+
+func assertMessagesSentToUser(t testing.TB, stdout *bytes.Buffer, messages ...string) {
+	t.Helper()
+	want := strings.Join(messages, "")
+	got := stdout.String()
+	if got != want {
+		t.Errorf("got %q sent to stdout but expected %+v", got, messages)
+	}
 }
