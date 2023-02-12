@@ -3,6 +3,7 @@ package e2e
 import (
 	"bytes"
 	"encoding/json"
+	"handson/internal/apierr"
 	"handson/internal/config"
 	"handson/internal/handler"
 	"handson/internal/logging"
@@ -113,7 +114,7 @@ func Test_E2E_PostUser_DuplicateEmail(t *testing.T) {
 	if err := json.NewDecoder(rec.Body).Decode(&result); err != nil {
 		t.Fatal(err)
 	}
-	if result.Message != string(handler.ErrEmailAlreadyExists) {
-		t.Errorf("error Message must be %s but %s", handler.ErrEmailAlreadyExists, result.Message)
+	if result.Message != string(apierr.ErrEmailAlreadyExists) {
+		t.Errorf("error Message must be %s but %s", apierr.ErrEmailAlreadyExists, result.Message)
 	}
 }
