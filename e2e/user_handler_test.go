@@ -81,12 +81,19 @@ func Test_E2E_PostUser_DuplicateEmail(t *testing.T) {
 		db.Close()
 	}()
 
+	email := "test@example.com"
+
+	if _, err := db.Exec("insert into users(first_name, last_name, email, password_hash) values (?, ?, ?, ?)", "dummy_first_name", "dummy_last_name", email, "dummy_password"); err != nil {
+		t.Fatal(err)
+	}
+
+	// 同じemailの別ユーザをPOSTする
 	var body bytes.Buffer
 	if err := json.NewEncoder(&body).Encode(&handler.ReqPostUserJSON{
 		FirstName: "テスト姓",
 		LastName:  "テスト名",
 		Email:     email,
-		Password:  password,
+		Password:  "passw0rd!456",
 	}); err != nil {
 		t.Fatal(err)
 	}
@@ -94,28 +101,6 @@ func Test_E2E_PostUser_DuplicateEmail(t *testing.T) {
 	// requestをシュミレートする
 	req := httptest.NewRequest(http.MethodPost, "/", &body)
 	rec := httptest.NewRecorder()
-	handler.PostUser(db, logging.Logger()).ServeHTTP(rec, req)
-
-	// responseのStatus Codeをチェックする
-	if rec.Code != http.StatusCreated {
-		t.Errorf("status code must be 201 but: %d", rec.Code)
-		t.Fatalf("body: %s", rec.Body.String())
-	}
-
-	// 同じemailの別ユーザをPOSTする
-	body.Reset()
-	if err := json.NewEncoder(&body).Encode(&handler.ReqPostUserJSON{
-		FirstName: "テスト姓2",
-		LastName:  "テスト名2",
-		Email:     email,
-		Password:  password,
-	}); err != nil {
-		t.Fatal(err)
-	}
-
-	// requestをシュミレートする
-	req = httptest.NewRequest(http.MethodPost, "/", &body)
-	rec = httptest.NewRecorder()
 	handler.PostUser(db, logging.Logger()).ServeHTTP(rec, req)
 
 	// responseのStatus Codeをチェックする
