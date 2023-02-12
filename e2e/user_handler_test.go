@@ -72,5 +72,55 @@ func Test_E2E_PostUser(t *testing.T) {
 // POST /users に対するtest
 // 重複するuserでリクエストを行う
 func Test_E2E_PostUser_DuplicateEmail(t *testing.T) {
-	// TODO: testを記述していく
+	db := sqlx.MustConnect("mysql", config.Config().DBSrc())
+	defer func() {
+		// DBのcleanを行う
+		db.MustExec("set foreign_key_checks = 0")
+		db.MustExec("truncate table users")
+		db.MustExec("set foreign_key_checks = 1")
+		db.Close()
+	}()
+
+	var body bytes.Buffer
+	if err := json.NewEncoder(&body).Encode(&handler.ReqPostUserJSON{
+		FirstName: "テスト姓",
+		LastName:  "テスト名",
+		Email:     email,
+		Password:  password,
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	// requestをシュミレートする
+	req := httptest.NewRequest(http.MethodPost, "/", &body)
+	rec := httptest.NewRecorder()
+	handler.PostUser(db, logging.Logger()).ServeHTTP(rec, req)
+
+	// responseのStatus Codeをチェックする
+	if rec.Code != http.StatusCreated {
+		t.Errorf("status code must be 201 but: %d", rec.Code)
+		t.Fatalf("body: %s", rec.Body.String())
+	}
+
+	// 同じemailの別ユーザをPOSTする
+	body.Reset()
+	if err := json.NewEncoder(&body).Encode(&handler.ReqPostUserJSON{
+		FirstName: "テスト姓2",
+		LastName:  "テスト名2",
+		Email:     email,
+		Password:  password,
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	// requestをシュミレートする
+	req = httptest.NewRequest(http.MethodPost, "/", &body)
+	rec = httptest.NewRecorder()
+	handler.PostUser(db, logging.Logger()).ServeHTTP(rec, req)
+
+	// responseのStatus Codeをチェックする
+	if rec.Code != http.StatusBadRequest {
+		t.Errorf("status code must be 400 but: %d", rec.Code)
+		t.Fatalf("body: %s", rec.Body.String())
+	}
 }
