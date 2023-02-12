@@ -121,6 +121,14 @@ func Test_E2E_PostUser_DuplicateEmail(t *testing.T) {
 	// responseのStatus Codeをチェックする
 	if rec.Code != http.StatusBadRequest {
 		t.Errorf("status code must be 400 but: %d", rec.Code)
-		t.Fatalf("body: %s", rec.Body.String())
+	}
+
+	// response メッセージを確認する
+	var result handler.ResError
+	if err := json.NewDecoder(rec.Body).Decode(&result); err != nil {
+		t.Fatal(err)
+	}
+	if result.Message != string(handler.ErrEmailAlreadyExists) {
+		t.Errorf("error Message must be %s but %s", handler.ErrEmailAlreadyExists, result.Message)
 	}
 }
