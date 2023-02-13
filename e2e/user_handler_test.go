@@ -7,6 +7,8 @@ import (
 	"handson/internal/config"
 	"handson/internal/handler"
 	"handson/internal/logging"
+	"handson/internal/repository"
+	"handson/internal/usecase"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -47,7 +49,8 @@ func Test_E2E_PostUser(t *testing.T) {
 	// requestをシュミレートする
 	req := httptest.NewRequest(http.MethodPost, "/", &body)
 	rec := httptest.NewRecorder()
-	handler.PostUser(db, logging.Logger()).ServeHTTP(rec, req)
+	userUsecase := usecase.NewUser(repository.NewUser(), db)
+	handler.PostUser(userUsecase, logging.Logger()).ServeHTTP(rec, req)
 
 	// responseのStatus Codeをチェックする
 	if rec.Code != http.StatusCreated {
@@ -102,7 +105,8 @@ func Test_E2E_PostUser_DuplicateEmail(t *testing.T) {
 	// requestをシュミレートする
 	req := httptest.NewRequest(http.MethodPost, "/", &body)
 	rec := httptest.NewRecorder()
-	handler.PostUser(db, logging.Logger()).ServeHTTP(rec, req)
+	userUsecase := usecase.NewUser(repository.NewUser(), db)
+	handler.PostUser(userUsecase, logging.Logger()).ServeHTTP(rec, req)
 
 	// responseのStatus Codeをチェックする
 	if rec.Code != http.StatusBadRequest {
