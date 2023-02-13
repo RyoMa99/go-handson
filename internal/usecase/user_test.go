@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"handson/internal/apierr"
 	"handson/internal/model"
 	"testing"
@@ -47,5 +48,48 @@ func TestUser_Create(t *testing.T) {
 
 	if passedMail != "test@example.com" {
 		t.Errorf("email must be test@example.com but %s", passedMail)
+	}
+}
+
+func TestUser_Create_DuplicateEmail(t *testing.T) {
+	mock := &userRepositoryMock{
+		findByEmailFn: func(ctx context.Context, queryer sqlx.QueryerContext, email string) (user *model.User, err error) {
+			return &model.User{}, nil
+		},
+		createFn: func(ctx context.Context, execer sqlx.ExecerContext, m *model.User) error {
+			return nil
+		},
+	}
+	sut := NewUser(mock, nil)
+	err := sut.Create(context.Background(), &model.User{
+		FirstName:    "test_first_name",
+		LastName:     "test_last_name",
+		Email:        "test@example.com",
+		PasswordHash: "aaa",
+	})
+
+	if !errors.Is(err, apierr.ErrEmailAlreadyExists) {
+		t.Errorf("error must be %v but %v", apierr.ErrEmailAlreadyExists, err)
+	}
+}
+
+// RepositoryのCreateが失敗したケース
+func TestUser_Create_Failed(t *testing.T) {
+	mock := &userRepositoryMock{
+		findByEmailFn: func(ctx context.Context, queryer sqlx.QueryerContext, email string) (user *model.User, err error) {
+			return nil, apierr.ErrUserNotExists
+		},
+		createFn: func(ctx context.Context, execer sqlx.ExecerContext, m *model.User) error {
+			return errors.New("unknown error")
+		},
+	}
+	sut := NewUser(mock, nil)
+	if err := sut.Create(context.Background(), &model.User{
+		FirstName:    "test_first_name",
+		LastName:     "test_last_name",
+		Email:        "test@example.com",
+		PasswordHash: "aaa",
+	}); err == nil {
+		t.Error("error should be not nil")
 	}
 }
