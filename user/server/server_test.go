@@ -3,7 +3,9 @@ package server
 import (
 	"context"
 	userpb "handson/user/proto"
+	"log"
 	"net"
+	"os"
 	"testing"
 
 	"google.golang.org/grpc"
@@ -11,19 +13,29 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 )
 
+var client userpb.UserServiceClient
+
+func TestMain(m *testing.M) {
+	lis := bufconn.Listen(1024 * 1024)
+	closer := serve(lis)
+	defer closer()
+
+	conn, err := grpc.Dial("localhost:50051", grpc.WithContextDialer(func(context.Context, string) (net.Conn, error) { return lis.Dial() }), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+	defer conn.Close()
+
+	client = userpb.NewUserServiceClient(conn)
+
+	code := m.Run()
+
+	os.Exit(code)
+}
+
 func TestServer(t *testing.T) {
 	t.Run("Get", func(t *testing.T) {
-		lis := bufconn.Listen(1024 * 1024)
-		closer := serve(lis)
-		defer closer()
-
-		conn, err := grpc.Dial("localhost:50051", grpc.WithContextDialer(func(context.Context, string) (net.Conn, error) { return lis.Dial() }), grpc.WithTransportCredentials(insecure.NewCredentials()))
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer conn.Close()
-
-		client := userpb.NewUserServiceClient(conn)
 
 		res, err := client.Get(context.Background(), &userpb.GetRequest{
 			Id: "1",
