@@ -49,3 +49,9 @@ func (s server) Get(context.Context, *userpb.GetRequest) (*userpb.GetResponse, e
 		Name: "taro",
 	}, nil
 }
+
+func (s server) CreateUser(ctx context.Context, in *userpb.CreateUserRequest) (*userpb.CreateUserResponse, error) {
+	return &userpb.CreateUserResponse{
+		Id: in.Id,
+	}, nil
+}
