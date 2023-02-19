@@ -4,7 +4,7 @@
 // - protoc             v3.6.1
 // source: user.proto
 
-package userpb
+package proto
 
 import (
 	context "context"
@@ -35,7 +35,7 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 
 func (c *userServiceClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
 	out := new(GetResponse)
-	err := c.cc.Invoke(ctx, "/userpb.UserService/Get", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.UserService/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func _UserService_Get_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/userpb.UserService/Get",
+		FullMethod: "/proto.UserService/Get",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).Get(ctx, req.(*GetRequest))
@@ -92,7 +92,7 @@ func _UserService_Get_Handler(srv interface{}, ctx context.Context, dec func(int
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var UserService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "userpb.UserService",
+	ServiceName: "proto.UserService",
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

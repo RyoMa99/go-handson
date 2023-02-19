@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"handson/user/userpb"
+	userpb "handson/user/proto"
 	"log"
 	"net"
 
