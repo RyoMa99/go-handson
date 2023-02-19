@@ -47,4 +47,19 @@ func TestServer(t *testing.T) {
 			t.Errorf("want taro,but get %s", res.Name)
 		}
 	})
+
+	t.Run("create user", func(t *testing.T) {
+		res, err := client.CreateUser(context.Background(), &userpb.CreateUserRequest{
+			Id:   "1",
+			Name: "taro",
+			Age:  23,
+		})
+
+		if err != nil {
+			t.Errorf("ERROR: %s", err)
+		}
+		if res.Id != "1" {
+			t.Errorf("want taro,but get %s", res.Id)
+		}
+	})
 }
