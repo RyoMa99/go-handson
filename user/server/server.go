@@ -38,12 +38,8 @@ func serve(lis net.Listener) (closer func()) {
 	}()
 
 	closer = func() {
-		err := lis.Close()
-		if err != nil {
-			log.Printf("error closing listener: %v", err)
-		}
 		log.Println("stopping gRPC server...")
-		s.Stop()
+		s.GracefulStop()
 	}
 	return closer
 }
