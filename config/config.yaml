@@ -1,0 +1,6 @@
+mongo:
+  database: oe
+  user: oe
+  password: oe
+  collection: user
+  conn: mongodb://localhost:27017
