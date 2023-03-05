@@ -5,6 +5,7 @@ import (
 	"errors"
 	"handson/config"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -18,10 +19,6 @@ type User struct {
 
 type UserDB interface {
 	UpsertOne(ctx context.Context, user *User) error
-}
-
-type userDB struct {
-	*mongo.Client
 }
 
 func NewUserDB(ctx context.Context, config *config.Config) (*userDB, error) {
@@ -39,9 +36,26 @@ func NewUserDB(ctx context.Context, config *config.Config) (*userDB, error) {
 	if err = client.Ping(ctx, nil); err != nil {
 		return nil, errors.New("cannot connect to mongodb instance")
 	}
-	return &userDB{client}, nil
+	return &userDB{
+		collection: client.Database(config.Mongo.Database).Collection(config.Mongo.Collection),
+	}, nil
+}
+
+type userDB struct {
+	collection *mongo.Collection
 }
 
 func (u *userDB) UpsertOne(ctx context.Context, user *User) error {
-	return nil
+	opts := options.Update().SetUpsert(true)
+	filter := bson.M{"_id": user.Id}
+	update := bson.M{
+		"$set": bson.M{
+			"age":  user.Age,
+			"name": user.Name,
+		},
+	}
+
+	_, err := u.collection.UpdateOne(ctx, filter, update, opts)
+
+	return err
 }
