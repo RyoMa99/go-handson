@@ -19,6 +19,7 @@ type User struct {
 
 type UserDB interface {
 	UpsertOne(ctx context.Context, user *User) error
+	FindOne(ctx context.Context, name string) (*User, error)
 }
 
 func NewUserDB(ctx context.Context, config *config.Config) (*userDB, error) {
@@ -58,4 +59,15 @@ func (u *userDB) UpsertOne(ctx context.Context, user *User) error {
 	_, err := u.collection.UpdateOne(ctx, filter, update, opts)
 
 	return err
+}
+
+func (u *userDB) FindOne(ctx context.Context, name string) (*User, error) {
+	var user *User
+	err := u.collection.FindOne(ctx, bson.M{"name": name}).Decode(user)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }

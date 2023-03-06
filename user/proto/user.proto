@@ -7,7 +7,7 @@ package proto;
 
 service UserService {
     rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
-    rpc Get (GetRequest) returns (GetResponse);
+    rpc FindUser (FindUSerRequest) returns (FindUserResponse);
 }
 
 message CreateUserRequest {
@@ -20,10 +20,13 @@ message CreateUserResponse {
     string id = 1;
 }
 
-message GetRequest {
-    string id = 1;
+message FindUSerRequest {
+    string name = 1;
 }
 
-message GetResponse {
-    string name = 1;
+message FindUserResponse {
+    string id = 1;
+    string name = 2;
+    int32 age = 3;
+
 }

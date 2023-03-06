@@ -48,9 +48,19 @@ func serve(lis net.Listener, userDB db.UserDB) (closer func()) {
 	return closer
 }
 
-func (s server) Get(context.Context, *userpb.GetRequest) (*userpb.GetResponse, error) {
-	return &userpb.GetResponse{
-		Name: "taro",
+func (s server) FindUser(ctx context.Context, in *userpb.FindUSerRequest) (*userpb.FindUserResponse, error) {
+	c, cancel := context.WithTimeout(ctx, time.Second)
+	defer cancel()
+
+	user, err := s.userDB.FindOne(c, in.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	return &userpb.FindUserResponse{
+		Id:   user.Id.Hex(),
+		Name: user.Name,
+		Age:  user.Age,
 	}, nil
 }
 
